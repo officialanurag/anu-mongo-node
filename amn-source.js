@@ -3,12 +3,10 @@
  *
  * Description: Contains mongoDB CRUD functions. It contains driver, connection
  * and method to drive operation on mongoDB. 
- *
+ *  
+ * Git Link: https://github.com/officialanurag/anu-mongo-node/
  * MIT License
  */
-
-// ------ Reserved -------
-var CONNECTION; 
 
 // ------ Settings -------
 var URL = "mongodb://localhost:27017/"; // Enter mongodb url and port here.
@@ -68,12 +66,21 @@ function anu_mongo_exec(action,dataObject,condition, callback){
 			break;
 
 			case 'update':
-				dbo.collection(dataObject.collection).updateOne(condition, dataObject.payload, function(err, res) {
+				dbo.collection(dataObject.collection).updateOne(condition, {$set: dataObject.payload}, function(err, res) {
 				    if (err) throw err;
-				    emit(console.log(res.result.nModified + " document(s) updated"));
+				    emit(res.result.nModified + " document(s) updated");
+				    callback(res.result);
 				    db.close();
 				});
-			break;			
+			break;	
+
+			case 'fetch':
+				dbo.collection(dataObject.collection).find(dataObject.payload).toArray(function(err, res) {
+				    if (err) throw err;				    
+				    callback(res);
+				    db.close();
+				});
+			break;		
 		}
 	});			
 }
@@ -84,7 +91,7 @@ module.exports = {
 	 * @method insert
 	 * @param collection, payload, callback function
 	 *
-	 * @return console output
+	 * @return console output, callback function
 	 */
 
 	insert : function (collection, payload, callback){
@@ -112,7 +119,7 @@ module.exports = {
 	 * @method update
 	 * @param collection, payload, callback function
 	 *
-	 * @return console output
+	 * @return console output, callback function
 	 */
 
 	update : function (collection, condition, payload, callback){
@@ -130,7 +137,7 @@ module.exports = {
 	 * @method delete
 	 * @param collection, payload, callback function
 	 *
-	 * @return console output
+	 * @return console output, callback function
 	 */	
 
 	delete : function (collection, payload, callback){
@@ -140,6 +147,42 @@ module.exports = {
 		};	
 		anu_mongo_exec('delete', PAYLOAD, null, function(output) {
 			callback(output);
+		});
+	},
+
+	/**
+	 * Description: To fetch data from mongoDB.
+	 * @method fetch
+	 * @param collection, payload, callback function
+	 *
+	 * @return console output, callback function
+	 */	
+
+	fetch : function (collection, payload, callback){
+		var PAYLOAD = {
+			'collection' : collection,
+			'payload' : payload
+		};	
+		anu_mongo_exec('fetch', PAYLOAD, null, function(output) {
+			callback(output);
+		});
+	},
+
+	/**
+	 * Description: To check if data is already present in mongoDB.
+	 * @method ifExists
+	 * @param collection, payload, callback function
+	 *
+	 * @return console output, callback function
+	 */
+
+	ifExists : function (collection, payload, callback){			
+		var PAYLOAD = {
+			'collection' : collection,
+			'payload' : { $or : payload } 
+		};	
+		anu_mongo_exec('fetch', PAYLOAD, null, function(output) {						
+			callback(output.length >= 1 ? true : false);
 		});
 	},
 
