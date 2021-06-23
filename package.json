@@ -1,10 +1,10 @@
 {
   "name": "anu-mongo-node",
   "version": "1.0.0",
-  "description": "Library for mongoDB operations supported in nodejs.",
+  "description": "Small Library (just for learning purpose) for mongoDB operations supported in nodejs. [Not recommended for production.]",
   "main": "amn-source.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node amn-source.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/officialanurag/anu-mongo-node#readme",
   "dependencies": {
-    "mongodb": "3.5.5"
+    "mongodb": "^3.5.5"
   }
 }
